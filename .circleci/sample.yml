@@ -10,7 +10,7 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter "build-tools-23.0.2"
   override:
     - chmod +x gradlew
-        - ./gradlew dependencies
+    - ./gradlew dependencies
 
 test:
   pre:
