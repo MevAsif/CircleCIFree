@@ -5,7 +5,4 @@ jobs:
     docker:
       - image: circleci/android:api-27-alpha
 
-      run:
-          name: Build Apk
-          command: ./gradlew build -PpreDexEnable=false -Pcom.android.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms3584m -Xmx3584m"
-
+      
