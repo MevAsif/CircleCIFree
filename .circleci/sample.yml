@@ -1,11 +1,26 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: michalmoczulski/simple-android-docker
+version: 1
+machine:
+  java:
+    version: oraclejdk8
+  environment:
+    # Java options
+    JAVA_OPTS: "-Xms512m -Xmx2048m"
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
-    working_directory: ~/workspace
+dependencies:
+  pre:
+    # Install the android packages
+    - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.3
 
-    steps:
-      - checkout
-      - run: gradle clean build
+
+test:
+  # REMOVED pre TAG
+    override:
+    # Generate a debug-apk
+    - ./gradlew assembleAppseeOffDebug -PdisablePreDex
+
+    # Copy the generated apk files to Circle-CI Artifacts
+    - cp -r app/build/outputs/apk/ $CIRCLE_ARTIFACTS
+
+    # Copy the test results to Circle-CI Artifacts
+    - cp -r app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
