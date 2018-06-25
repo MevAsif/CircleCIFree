@@ -1,27 +1,31 @@
-version: 1
-machine:
-  java:
-    version: oraclejdk8
-  environment:
-    # Java options
-    JAVA_OPTS: "-Xms512m -Xmx2048m"
-    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-dependencies:
-  pre:
-    # Install the android packages
-    - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.3
-    - chmod 777 gradlew
-    - chmod a+x gradlew
-
-test:
-  # REMOVED pre TAG
-    override:
-    # Generate a debug-apk
-    - ./gradlew assembleAppseeOffDebug -PdisablePreDex
-
-    # Copy the generated apk files to Circle-CI Artifacts
-    - cp -r app/build/outputs/apk/ $CIRCLE_ARTIFACTS
-
-    # Copy the test results to Circle-CI Artifacts
-    - cp -r app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-25-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
+         command: sudo chmod +x ./gradlew
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew lint test
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports
+      - store_test_results:
+          path: app/build/test-results
+      # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
