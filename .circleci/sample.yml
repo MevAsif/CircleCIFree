@@ -11,7 +11,8 @@ dependencies:
   pre:
     # Install the android packages
     - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.3
-
+    - chmod 777 gradlew
+    - chmod a+x gradlew
 
 test:
   # REMOVED pre TAG
