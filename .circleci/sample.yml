@@ -1,6 +1,11 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: michalmoczulski/simple-android-docker
 
- machine:
-  java:
-    version: oraclejdk8
+    working_directory: ~/workspace
 
- 
+    steps:
+      - checkout
+      - run: gradle clean build
